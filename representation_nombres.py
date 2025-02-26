@@ -1,4 +1,4 @@
-""" Representation binaire des nombres : outils"""
+""" TP1 Representation binaire des nombres : outils"""
 
 import numpy as np
 import struct
