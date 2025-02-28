@@ -1,7 +1,10 @@
+import numpy as np
+import scipy.linalg
+
 
 def lu_b_exo2():
     B = np.array([[-2,3,0],[1,0,-4],[2,0,5]])
-    return lu(B)
+    return scipy.linalg.lu(B)
 
 def exo2_veriflu():
     L = np.array([[1,0,0],[-0.5,1,0],[-1,2,1]])
@@ -17,8 +20,8 @@ def exo2_verif_sys():
 ## TP n°3 - Séance 5 ###
 
 
-def decomp_lapl_lu(n):
-    return lu(Lapl_base(n))
+# def decomp_lapl_lu(n):
+#     return scipy.linalg.lu(Lapl_base(n))
 
 def essai():
     return(np.array([[1,2,1],[2,13,-1],[1,-1,3]]))
@@ -26,24 +29,38 @@ def essai():
 def identite():
     return np.array([[1,0,0],[0,1,0],[0,0,1]])
 
-## TP n)3 - Séance 6 ###
+## TP n°3 - Séance 6 ###
 
-'''Exercice 5 '''
+#%% EXERCICE 
 
-B = np.eye(3)
-B[1,2] = 5
+# B = np.eye(3)
+# B[1,2] = 5
+b = np.array([[3],[2],[0]])
 D = np.random.uniform(-5, 5, (3, 3))
 
-b = np.array([[3],[2],[0]])
-c = np.array([[3],[0],[0]])
-d = np.array([[10],[1]])
+# F = np.random.uniform(-5, 5, (5, 3))
+# G = np.random.uniform(-5, 5, (1, 2))
+# Z = np.random.uniform(-5, 5, (1, 3))
+# K = np.random.uniform(-5, 5, (5, 2))
+# F = np.random.uniform(-5, 5, (2, 2))
+# G = np.random.uniform(-5, 5, (2, 2))
+# Z = np.random.uniform(-5, 5, (2, 2))
+# K = np.random.uniform(-5, 5, (2, 2))
+
+# U = np.random.uniform(-5, 5, (3, 3))
+# V = np.random.uniform(-5, 5, (3, 2))
+# W = np.random.uniform(-5, 5, (2, 2))
+
+
+# c = np.array([[3],[0],[0]])
+# d = np.array([[10],[1]])
 
 
 
 
-def householder(v):
-    (l,c)=np.shape(v)
-    return(np.identity(l)-2*(v*(v.T))/np.trace((v.T)*v))
+# def householder(v):
+#     (l,c)=np.shape(v)
+#     return(np.identity(l)-2*(v*(v.T))/np.trace((v.T)*v))
 
 
 
@@ -75,7 +92,7 @@ def v(a):
 
 def H(v):
     n,_ = np.shape(v)
-    return np.eye(n) - 2*np.dot(v,v.T)/(N(v)**2)
+    return np.eye(n) - 2*np.dot(v,v.T) / N(v)**2
 
 
 def Hk(k,n,v):
@@ -121,7 +138,7 @@ def householder_qr(A):
     return Q,R
 
 
-def verif():
+def verif_hqr():
 
     print(D)
     print()
@@ -134,10 +151,38 @@ def verif():
     print(np.dot(Q,R))
 
 
-def col(A,i):
-    Vi = A[:,i].reshape(-1,1)
-    return Vi
+def col(A,i, plat=False):
+    if not plat :
+        Vi = A[:,i].copy().reshape(-1,1)
+        return Vi
+    else :
+        return A[:,i].copy()
 
+# def qr_schmidt(A):
+#     assert np.linalg.det(A) != 0
+#     n,_ = np.shape(A)
+
+#     O = np.zeros((n,n))
+#     S = np.zeros((n,n))
+
+#     W = [-1] * n
+
+#     for i in range(n):
+#         Vi = col(A,i)
+#         Wi = Vi.copy()
+#         for k in range(i):
+#             S[k,i] = np.vdot(Vi,W[k])
+#             Wi -= S[k,i] * W[k]
+
+#         S[i,i] = nWi = np.linalg.norm(Wi) # double assignation jamais dangereuse car c'est une valeur non mutable
+#         Wi = 1/nWi * Wi
+
+#         # O[:,i] = W[i] = Wi.reshape(-1,1) # techniquement cette double assignation est dangereuse car O[:,i] et W[i] partagent alors la même référence mémoire vers un objet mutables donc seraient modifiés tous les deux. Mais dans ce code ce n'est pas prévu de les modifier et ça serait cohérent anyway.
+#         O[:,i] = Wi.ravel()
+#         W[i] = Wi.reshape(-1,1)
+    
+#     return O, S
+        
 def qr_schmidt(A):
     assert np.linalg.det(A) != 0
     n,_ = np.shape(A)
@@ -145,16 +190,36 @@ def qr_schmidt(A):
     O = np.zeros((n,n))
     S = np.zeros((n,n))
 
-    W = []
+    W = [-1] * n
 
     for i in range(n):
-        Vi = col(A,i)
+        Vi = col(A,i, plat=True)
         Wi = Vi.copy()
         for k in range(i):
-            S[k,i] = np.dot(Vi,W[k])
+            S[k,i] = np.vdot(Vi,W[k])
             Wi -= S[k,i] * W[k]
 
-        S[i,i] = nWi = np.linalg.norm(Wi)
+        S[i,i] = nWi = np.linalg.norm(Wi) # double assignation jamais dangereuse car c'est une valeur non mutable
         Wi = 1/nWi * Wi
 
-        O[:,i] = W[i] = Wi.resize(-1,1)
+        O[:,i] = W[i] = Wi # techniquement cette double assignation est dangereuse car O[:,i] et W[i] partagent alors la même référence mémoire vers un objet mutables donc seraient modifiés tous les deux. Mais dans ce code ce n'est pas prévu de les modifier et ça serait cohérent anyway.
+      
+    
+    return O, S
+
+        
+#%%
+
+def verif_sqr():
+    print(D)
+    print()
+    
+    Q, R = qr_schmidt(D)
+    print(Q)
+    print(R)
+    
+    print()
+    print(Q@R)
+
+# qr_schmidt(D)
+        
